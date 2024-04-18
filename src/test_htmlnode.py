@@ -1,6 +1,16 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import (
+    HTMLNode,
+    LeafNode,
+    ParentNode,
+    quote_block_to_html_node,
+    code_block_to_html_node,
+    heading_block_to_html_node,
+    paragraph_block_to_html_node,
+    ordered_list_block_to_html_node,
+    unordered_list_block_to_html_node,
+)
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -80,6 +90,65 @@ class TestParentNode(unittest.TestCase):
             parent_node.to_html(),
             "<section><div><b>child 1</b></div><div><b>child 2</b></div></section>",
         )
+
+    def test_create_quote_html_node(self):
+        block = ">example quote\n>another line\n>and another"
+        actual = quote_block_to_html_node(block)
+        expected = ParentNode("blockquote", [LeafNode(None, block)])
+        self.assertEqual(actual, expected)
+
+    def test_code_block_to_html_node(self):
+        block = "```print('something')```"
+        actual = code_block_to_html_node(block)
+        expected = ParentNode(
+            "pre", [ParentNode("code", [LeafNode(None, "print('something')")])]
+        )
+        self.assertEqual(actual, expected)
+
+    def test_heading_block_to_html_node(self):
+        blocks = [
+            ("# Heading 1", ParentNode("h1", [LeafNode(None, "Heading 1")])),
+            ("## Heading 2", ParentNode("h2", [LeafNode(None, "Heading 2")])),
+            ("### Heading 3", ParentNode("h3", [LeafNode(None, "Heading 3")])),
+            ("#### Heading 4", ParentNode("h4", [LeafNode(None, "Heading 4")])),
+            ("##### Heading 5", ParentNode("h5", [LeafNode(None, "Heading 5")])),
+            ("###### Heading 6", ParentNode("h6", [LeafNode(None, "Heading 6")])),
+        ]
+        for block, expected in blocks:
+            actual = heading_block_to_html_node(block)
+            self.assertEqual(actual, expected)
+
+    def test_paragraph_block_to_html_node(self):
+        block = "Test paragraph"
+        actual = paragraph_block_to_html_node(block)
+        expected = ParentNode("p", [LeafNode(None, block)])
+        self.assertEqual(actual, expected)
+
+    def test_ordered_list_block_to_html_node(self):
+        block = "1. first item\n2. second item\n3. third item"
+        actual = ordered_list_block_to_html_node(block)
+        expected = ParentNode(
+            "ol",
+            [
+                ParentNode("li", [LeafNode(None, "first item\n")]),
+                ParentNode("li", [LeafNode(None, "second item\n")]),
+                ParentNode("li", [LeafNode(None, "third item")]),
+            ],
+        )
+        self.assertEqual(actual, expected)
+
+    def test_unordered_list_block_to_html_node(self):
+        block = "* first item\n- second item\n* third item"
+        actual = unordered_list_block_to_html_node(block)
+        expected = ParentNode(
+            "ul",
+            [
+                ParentNode("li", [LeafNode(None, "first item\n")]),
+                ParentNode("li", [LeafNode(None, "second item\n")]),
+                ParentNode("li", [LeafNode(None, "third item")]),
+            ],
+        )
+        self.assertEqual(actual, expected)
 
 
 if __name__ == "__main__":

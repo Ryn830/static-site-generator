@@ -1,3 +1,5 @@
+import re
+
 from textnode import (
     text_type_text,
     text_type_bold,
@@ -5,7 +7,9 @@ from textnode import (
     text_type_image,
     text_type_italic,
     text_type_link,
+    TextNode,
 )
+from inline import text_to_textnodes
 
 
 class HTMLNode:
@@ -32,6 +36,19 @@ class HTMLNode:
 
         return "".join(prop_list)
 
+    def __eq__(self, value) -> bool:
+        return (
+            self.tag == value.tag
+            and self.value == value.value
+            and self.props == value.props
+            and all(
+                [
+                    self_child == value_child
+                    for self_child, value_child in zip(self.children, value.children)
+                ]
+            )
+        )
+
 
 class LeafNode(HTMLNode):
     def __init__(self, tag: str, value: str, props=None) -> None:
@@ -41,6 +58,16 @@ class LeafNode(HTMLNode):
 
     def to_html(self):
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+
+    def __eq__(self, value) -> bool:
+        return (
+            self.tag == value.tag
+            and self.value == value.value
+            and self.props == value.props
+        )
+
+    def __repr__(self) -> str:
+        return f"LeafNode({self.tag}, {self.value}, {self.props})"
 
 
 class ParentNode(HTMLNode):
@@ -55,18 +82,80 @@ class ParentNode(HTMLNode):
         nodes = "".join([node.to_html() for node in self.children])
         return f"<{self.tag}{self.props_to_html()}>{nodes}</{self.tag}>"
 
+    def __repr__(self) -> str:
+        return f"ParentNode({self.tag}, {self.children}, {self.props})"
 
-def text_node_to_html_node(text_node: str):
+
+def text_node_to_html_node(text_node: TextNode):
     if text_node.text_type == text_type_text:
-        return LeafNode(None, text_node.value)
+        return LeafNode(None, text_node.text)
     if text_node.text_type == text_type_bold:
-        return LeafNode("b", text_node.value)
+        return LeafNode("b", text_node.text)
     if text_node.text_type == text_type_italic:
-        return LeafNode("i", text_node.value)
+        return LeafNode("i", text_node.text)
     if text_node.text_type == text_type_code:
-        return LeafNode("code", text_node.value)
+        return LeafNode("code", text_node.text)
     if text_node.text_type == text_type_link:
         return LeafNode("a", text_node.value, {"href": text_node.url})
     if text_node.text_type == text_type_image:
-        return LeafNode("img", "", {"src": text_node.url, "alt": text_node.value})
+        return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
     raise ValueError(f"Unrecognized text_type found on {text_node}")
+
+
+def quote_block_to_html_node(block: str):
+    text_nodes = text_to_textnodes(block)
+    child_html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+    html = ParentNode("blockquote", child_html_nodes)
+    return html
+
+
+def unordered_list_block_to_html_node(block: str):
+    items = [item for item in re.split("[*-] ", block) if len(item)]
+    list_items = [
+        ParentNode(
+            "li",
+            [text_node_to_html_node(node) for node in text_to_textnodes(list_item)],
+        )
+        for list_item in items
+    ]
+    html = ParentNode("ul", list_items)
+    return html
+
+
+def ordered_list_block_to_html_node(block: str):
+    items = [item for item in re.split("\d+\. ", block) if len(item)]
+    list_items = [
+        ParentNode(
+            "li",
+            [text_node_to_html_node(node) for node in text_to_textnodes(list_item)],
+        )
+        for list_item in items
+    ]
+    html = ParentNode("ol", list_items)
+    return html
+
+
+def code_block_to_html_node(block: str):
+    text = block.lstrip("```").rstrip("```")
+    text_nodes = text_to_textnodes(text)
+    child_html_nodes = [
+        ParentNode("code", [text_node_to_html_node(node) for node in text_nodes])
+    ]
+    html = ParentNode("pre", child_html_nodes)
+    return html
+
+
+def heading_block_to_html_node(block: str):
+    heading_level = block.count("#", 0, block.index(" "))
+    text = block.split(" ", 1).pop(1)
+    text_nodes = text_to_textnodes(text)
+    child_html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+    html = ParentNode(f"h{heading_level}", child_html_nodes)
+    return html
+
+
+def paragraph_block_to_html_node(block: str):
+    text_nodes = text_to_textnodes(block)
+    child_html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+    html = ParentNode("p", child_html_nodes)
+    return html
