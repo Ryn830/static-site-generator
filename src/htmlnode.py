@@ -138,7 +138,7 @@ def ordered_list_block_to_html_node(block: str):
 
 
 def code_block_to_html_node(block: str):
-    text = block.lstrip("```").rstrip("```")
+    text = block.lstrip("```\n").rstrip("```")
     text_nodes = text_to_textnodes(text)
     child_html_nodes = [
         ParentNode("code", [text_node_to_html_node(node) for node in text_nodes])

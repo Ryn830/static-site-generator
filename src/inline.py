@@ -92,5 +92,5 @@ def text_to_textnodes(text: str):
     and_links = split_nodes_link(and_images)
     and_code = split_nodes_delimiter(and_links, "`", text_type_code)
     and_bold = split_nodes_delimiter(and_code, "**", text_type_bold)
-    all_nodes = split_nodes_delimiter(and_bold, "*", text_type_italic)
+    all_nodes = split_nodes_delimiter(and_bold, "_", text_type_italic)
     return [node for node in all_nodes if len(node.text)]
