@@ -37,3 +37,9 @@ def extract_title(markdown: str):
         return heading.pop(0).lstrip("# ")
     except:
         raise ValueError(f"Page require a heading: {markdown}")
+
+
+def generate_pages_recursive(
+    dir_path_content: str, template_path: str, dest_dir_path: str
+):
+    pass
