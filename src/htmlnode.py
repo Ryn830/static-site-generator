@@ -105,7 +105,7 @@ def text_node_to_html_node(text_node: TextNode):
 
 
 def quote_block_to_html_node(block: str):
-    text_nodes = text_to_textnodes(block)
+    text_nodes = text_to_textnodes("".join(re.split("\n?> ", block)))
     child_html_nodes = [text_node_to_html_node(node) for node in text_nodes]
     html = ParentNode("blockquote", child_html_nodes)
     return html
