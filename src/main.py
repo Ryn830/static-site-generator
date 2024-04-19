@@ -1,14 +1,28 @@
-from textnode import TextNode
-from htmlnode import HTMLNode
+from os import path, listdir, mkdir
+from shutil import copy, rmtree
+
+
+def copy_contents(src: str, dest: str):
+    if path.isfile(src):
+        copy(path.join(src), path.join(dest))
+    else:
+        files = listdir(src)
+        for file in files:
+            if path.isfile(path.join(src, file)):
+                copy(path.join(src, file), path.join(dest, file))
+            else:
+                mkdir(path.join(dest, file))
+                copy_contents(path.join(src, file), path.join(dest, file))
 
 
 def main():
-    node = TextNode("This is a text node", "bold", "https://www.boot.dev")
-    print(node)
-    htmlnode = HTMLNode(
-        "a", "link tag", None, {"href": "https://www.boot.dev", "target": "_blank"}
-    )
-    print(htmlnode)
+    if not path.exists("public"):
+        mkdir("public")
+    else:
+        rmtree("public")
+        mkdir("public")
+
+    copy_contents("static", "public")
 
 
 main()
