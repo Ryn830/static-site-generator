@@ -93,4 +93,4 @@ def text_to_textnodes(text: str):
     and_code = split_nodes_delimiter(and_links, "`", text_type_code)
     and_bold = split_nodes_delimiter(and_code, "**", text_type_bold)
     all_nodes = split_nodes_delimiter(and_bold, "*", text_type_italic)
-    return all_nodes
+    return [node for node in all_nodes if len(node.text)]

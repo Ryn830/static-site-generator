@@ -53,10 +53,12 @@ class HTMLNode:
 class LeafNode(HTMLNode):
     def __init__(self, tag: str, value: str, props=None) -> None:
         super().__init__(tag, value, None, props)
-        if not self.value:
+        if self.value is None:
             raise ValueError("LeafNodes require values.")
 
     def to_html(self):
+        if self.tag is None:
+            return self.value
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
     def __eq__(self, value) -> bool:
@@ -73,9 +75,9 @@ class LeafNode(HTMLNode):
 class ParentNode(HTMLNode):
     def __init__(self, tag: str, children: object, props=None) -> None:
         super().__init__(tag, None, children, props)
-        if not tag:
+        if self.tag is None:
             raise ValueError("ParentNodes require tags.")
-        if not children or not len(children):
+        if children is None or not len(children):
             raise ValueError("ParentNodes require children.")
 
     def to_html(self):
@@ -96,7 +98,7 @@ def text_node_to_html_node(text_node: TextNode):
     if text_node.text_type == text_type_code:
         return LeafNode("code", text_node.text)
     if text_node.text_type == text_type_link:
-        return LeafNode("a", text_node.value, {"href": text_node.url})
+        return LeafNode("a", text_node.text, {"href": text_node.url})
     if text_node.text_type == text_type_image:
         return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
     raise ValueError(f"Unrecognized text_type found on {text_node}")

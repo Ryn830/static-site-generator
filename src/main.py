@@ -1,6 +1,8 @@
 from os import path, listdir, mkdir
 from shutil import copy, rmtree
 
+from generate_page import generate_page
+
 
 def copy_contents(src: str, dest: str):
     if path.isfile(src):
@@ -18,11 +20,12 @@ def copy_contents(src: str, dest: str):
 
 
 def main():
-    if path.exists("public"):
-        rmtree("public")
-    mkdir("public")
+    # if path.exists("public"):
+    #     rmtree("public")
+    # mkdir("public")
 
-    copy_contents("static", "public")
+    # copy_contents("static", "public")
+    generate_page("content/index.md", "template.html", "public/index.html")
 
 
 main()
