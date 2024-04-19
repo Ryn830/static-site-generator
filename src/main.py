@@ -4,23 +4,23 @@ from shutil import copy, rmtree
 
 def copy_contents(src: str, dest: str):
     if path.isfile(src):
-        copy(path.join(src), path.join(dest))
+        copy(src, dest)
     else:
         files = listdir(src)
         for file in files:
-            if path.isfile(path.join(src, file)):
-                copy(path.join(src, file), path.join(dest, file))
+            src_path = path.join(src, file)
+            dest_path = path.join(dest, file)
+            if path.isfile(src_path):
+                copy(src_path, dest_path)
             else:
-                mkdir(path.join(dest, file))
-                copy_contents(path.join(src, file), path.join(dest, file))
+                mkdir(dest_path)
+                copy_contents(src_path, dest_path)
 
 
 def main():
-    if not path.exists("public"):
-        mkdir("public")
-    else:
+    if path.exists("public"):
         rmtree("public")
-        mkdir("public")
+    mkdir("public")
 
     copy_contents("static", "public")
 
