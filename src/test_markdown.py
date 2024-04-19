@@ -46,7 +46,7 @@ This is the same paragraph on a new line
                     "ul",
                     [
                         ParentNode(
-                            "li", [LeafNode(None, "This is a list\n", None)], None
+                            "li", [LeafNode(None, "This is a list", None)], None
                         ),
                         ParentNode("li", [LeafNode(None, "with items", None)], None),
                     ],

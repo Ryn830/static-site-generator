@@ -112,7 +112,7 @@ def quote_block_to_html_node(block: str):
 
 
 def unordered_list_block_to_html_node(block: str):
-    items = [item for item in re.split("[*-] ", block) if len(item)]
+    items = [item for item in re.split("\n?[*-] ", block) if len(item)]
     list_items = [
         ParentNode(
             "li",
@@ -125,7 +125,7 @@ def unordered_list_block_to_html_node(block: str):
 
 
 def ordered_list_block_to_html_node(block: str):
-    items = [item for item in re.split("\d+\. ", block) if len(item)]
+    items = [item for item in re.split("\n?\d+\. ", block) if len(item)]
     list_items = [
         ParentNode(
             "li",

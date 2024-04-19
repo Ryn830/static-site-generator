@@ -130,8 +130,8 @@ class TestParentNode(unittest.TestCase):
         expected = ParentNode(
             "ol",
             [
-                ParentNode("li", [LeafNode(None, "first item\n")]),
-                ParentNode("li", [LeafNode(None, "second item\n")]),
+                ParentNode("li", [LeafNode(None, "first item")]),
+                ParentNode("li", [LeafNode(None, "second item")]),
                 ParentNode("li", [LeafNode(None, "third item")]),
             ],
         )
@@ -143,8 +143,8 @@ class TestParentNode(unittest.TestCase):
         expected = ParentNode(
             "ul",
             [
-                ParentNode("li", [LeafNode(None, "first item\n")]),
-                ParentNode("li", [LeafNode(None, "second item\n")]),
+                ParentNode("li", [LeafNode(None, "first item")]),
+                ParentNode("li", [LeafNode(None, "second item")]),
                 ParentNode("li", [LeafNode(None, "third item")]),
             ],
         )
