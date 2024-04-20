@@ -1,4 +1,5 @@
-from os import path, makedirs
+from os import path, mkdir, makedirs, listdir
+from pathlib import Path
 
 from blocks import is_heading_block
 
@@ -8,6 +9,8 @@ TITLE_PLACEHOLDER = "{{ Title }}"
 CONTENT_PLACEHOLDER = "{{ Content }}"
 
 
+# Creates index.html files for each markdown file
+# Implies that only one .md file can be stored in each directory within
 def generate_page(from_path: str, template_path: str, dest_path: str):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
@@ -39,7 +42,19 @@ def extract_title(markdown: str):
         raise ValueError(f"Page require a heading: {markdown}")
 
 
+# Only include .md files within content directory
 def generate_pages_recursive(
-    dir_path_content: str, template_path: str, dest_dir_path: str
+    src_path_content: str, template_path: str, dest_dir_path: str
 ):
-    pass
+    if path.isfile(src_path_content) and Path(src_path_content).suffix == ".md":
+        generate_page(src_path_content, template_path, dest_dir_path)
+    else:
+        files = listdir(src_path_content)
+        for file in files:
+            src_path = path.join(src_path_content, file)
+            dest_path = path.join(dest_dir_path, file)
+            if path.isfile(src_path):
+                generate_page(src_path, template_path, dest_path)
+            else:
+                mkdir(dest_path)
+                generate_pages_recursive(src_path, template_path, dest_path)

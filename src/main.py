@@ -1,22 +1,8 @@
-from os import path, listdir, mkdir
-from shutil import copy, rmtree
+from os import path, mkdir
+from shutil import rmtree
 
-from generate_page import generate_page
-
-
-def copy_contents(src: str, dest: str):
-    if path.isfile(src):
-        copy(src, dest)
-    else:
-        files = listdir(src)
-        for file in files:
-            src_path = path.join(src, file)
-            dest_path = path.join(dest, file)
-            if path.isfile(src_path):
-                copy(src_path, dest_path)
-            else:
-                mkdir(dest_path)
-                copy_contents(src_path, dest_path)
+from generate_page import generate_pages_recursive
+from copy_contents import copy_contents
 
 
 def main():
@@ -25,7 +11,7 @@ def main():
     mkdir("public")
 
     copy_contents("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content", "template.html", "public")
 
 
 main()
